@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>DigitalStore - Jualan Produk Digital</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Background Effects -->
+    <div class="bg-mesh">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+        <div class="orb orb-4"></div>
+    </div>
+    <div class="noise"></div>
+
+    <!-- Auth Screen (tampil jika belum login) -->
+    <div id="authScreen" class="auth-screen">
+        <div class="auth-content">
+            <div class="auth-logo">
+                <i class="fas fa-bolt"></i>
+                <h1>DigitalStore</h1>
+            </div>
+            <p class="auth-subtitle">Platform jualan produk digital<br>terintegrasi cloud</p>
+
+            <div class="auth-features">
+                <div class="auth-feature">
+                    <i class="fas fa-cloud"></i>
+                    <span>Data tersimpan di cloud</span>
+                </div>
+                <div class="auth-feature">
+                    <i class="fas fa-shield-halved"></i>
+                    <span>Aman & terenkripsi</span>
+                </div>
+                <div class="auth-feature">
+                    <i class="fas fa-globe"></i>
+                    <span>Akses dari mana saja</span>
+                </div>
+            </div>
+
+            <button class="auth-google-btn" onclick="Auth.signInWithGoogle()">
+                <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google">
+                <span>Masuk dengan Google</span>
+            </button>
+
+            <p class="auth-hint">Data produk Anda akan tersinkronisasi otomatis</p>
+        </div>
+    </div>
+
+    <!-- App Container (tampil setelah login) -->
+    <div class="app" id="appContainer" style="display:none;">
+
+        <!-- Navbar Glass -->
+        <nav class="nav-glass">
+            <div class="nav-content">
+                <div class="nav-brand">
+                    <i class="fas fa-bolt"></i>
+                    <span>DigitalStore</span>
+                </div>
+                <div class="nav-actions">
+                    <button class="ios-btn primary" onclick="App.openSheet()">
+                        <i class="fas fa-plus"></i>
+                        <span>Baru</span>
+                    </button>
+                    <button class="ios-btn" onclick="App.toggleCart()" style="position:relative;">
+                        <i class="fas fa-bag-shopping"></i>
+                        <span class="cart-badge" id="cartBadge">0</span>
+                    </button>
+                    <button class="ios-btn" onclick="App.toggleProfile()" id="profileBtn">
+                        <img id="userAvatar" src="" alt="" style="width:100%;height:100%;border-radius:50%;object-fit:cover;display:none;">
+                        <i class="fas fa-user" id="userIcon"></i>
+                    </button>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Hero Section -->
+        <section class="hero-ios">
+            <p class="hero-greeting" id="userGreeting">Selamat datang 👋</p>
+            <h1 class="hero-title">Kelola Produk<br>Digital Anda</h1>
+
+            <div class="search-ios">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" placeholder="Cari produk..." oninput="App.search()">
+            </div>
+        </section>
+
+        <!-- Connection Status -->
+        <div class="sync-status" id="syncStatus">
+            <i class="fas fa-wifi"></i>
+            <span>Online • Tersinkronisasi</span>
+        </div>
+
+        <!-- Stats Horizontal Scroll -->
+        <div class="stats-scroll" id="statsContainer">
+            <div class="stat-glass">
+                <div class="stat-icon blue"><i class="fas fa-cube"></i></div>
+                <div class="stat-value" id="statProducts">0</div>
+                <div class="stat-label">Produk</div>
+            </div>
+            <div class="stat-glass">
+                <div class="stat-icon purple"><i class="fas fa-tags"></i></div>
+                <div class="stat-value" id="statCategories">0</div>
+                <div class="stat-label">Kategori</div>
+            </div>
+            <div class="stat-glass">
+                <div class="stat-icon green"><i class="fas fa-wallet"></i></div>
+                <div class="stat-value" id="statValue">Rp0</div>
+                <div class="stat-label">Nilai</div>
+            </div>
+            <div class="stat-glass">
+                <div class="stat-icon orange"><i class="fas fa-shopping-bag"></i></div>
+                <div class="stat-value" id="statCart">0</div>
+                <div class="stat-label">Keranjang</div>
+            </div>
+        </div>
+
+        <!-- Products Section -->
+        <div class="section-ios">
+            <h2>Katalog Produk</h2>
+            <button class="link-btn" onclick="App.showHelp()">Bantuan</button>
+        </div>
+
+        <div class="products-ios" id="productsContainer">
+            <!-- Products rendered by JS -->
+        </div>
+
+        <div style="height: 100px;"></div>
+    </div>
+
+    <!-- Bottom Tab Bar -->
+    <div class="tab-bar" id="tabBar" style="display:none;">
+        <button class="tab-item active" onclick="App.switchTab('home', this)">
+            <i class="fas fa-house"></i>
+            <span>Beranda</span>
+        </button>
+        <button class="tab-item" onclick="App.scrollToProducts()">
+            <i class="fas fa-cube"></i>
+            <span>Produk</span>
+        </button>
+        <button class="tab-item" onclick="App.toggleCart()">
+            <i class="fas fa-bag-shopping"></i>
+            <span>Keranjang</span>
+        </button>
+        <button class="tab-item" onclick="App.showSettings()">
+            <i class="fas fa-gear"></i>
+            <span>Pengaturan</span>
+        </button>
+    </div>
+
+    <!-- ==================== MODALS / SHEETS ==================== -->
+
+    <!-- Profile Sheet -->
+    <div class="sheet-overlay" id="profileSheetOverlay" onclick="App.closeProfile(event)">
+        <div class="sheet-modal" onclick="event.stopPropagation()">
+            <div class="sheet-handle"></div>
+            <div class="sheet-header">
+                <h3 class="sheet-title">Profil</h3>
+                <button class="sheet-close" onclick="App.closeProfile()"><i class="fas fa-xmark"></i></button>
+            </div>
+            <div class="sheet-body">
+                <div class="profile-card">
+                    <img id="profileAvatar" src="" alt="">
+                    <div class="profile-info">
+                        <h3 id="profileName">User</h3>
+                        <p id="profileEmail">email@example.com</p>
+                    </div>
+                </div>
+                <div class="profile-stats">
+                    <div class="profile-stat">
+                        <span id="profileProductCount">0</span>
+                        <label>Produk</label>
+                    </div>
+                    <div class="profile-stat">
+                        <span id="profileCartCount">0</span>
+                        <label>Keranjang</label>
+                    </div>
+                </div>
+            </div>
+            <div class="sheet-footer">
+                <button class="ios-btn-large danger" onclick="Auth.signOut()">
+                    <i class="fas fa-right-from-bracket"></i> Keluar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Product Sheet -->
+    <div class="sheet-overlay" id="productSheetOverlay" onclick="App.closeSheet(event)">
+        <div class="sheet-modal" onclick="event.stopPropagation()">
+            <div class="sheet-handle"></div>
+            <div class="sheet-header">
+                <h3 class="sheet-title" id="sheetTitle">Produk Baru</h3>
+                <button class="sheet-close" onclick="App.closeSheet()"><i class="fas fa-xmark"></i></button>
+            </div>
+            <div class="sheet-body">
+                <form id="productForm">
+                    <input type="hidden" id="productId">
+
+                    <div class="form-group">
+                        <label class="form-label">Nama Produk</label>
+                        <input type="text" class="ios-input" id="productName" placeholder="Contoh: Ebook Premium" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Kategori</label>
+                        <select class="ios-input ios-select" id="productCategory" required>
+                            <option value="">Pilih Kategori</option>
+                            <option value="Ebook">📚 Ebook</option>
+                            <option value="Template">🎨 Template</option>
+                            <option value="Software">💻 Software</option>
+                            <option value="Course">🎓 Course</option>
+                            <option value="Design">✨ Design Asset</option>
+                            <option value="Audio">🎵 Audio</option>
+                            <option value="Video">🎬 Video</option>
+                            <option value="Lainnya">📦 Lainnya</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Deskripsi</label>
+                        <textarea class="ios-input ios-textarea" id="productDesc" placeholder="Deskripsikan produk Anda..." required></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Harga (Rp)</label>
+                        <input type="number" class="ios-input" id="productPrice" placeholder="50000" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Link Produk (Download/Checkout)</label>
+                        <input type="url" class="ios-input" id="productLink" placeholder="https://..." required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Foto Produk</label>
+                        <div class="image-upload" id="imageUpload">
+                            <input type="file" id="productImage" accept="image/*" onchange="App.handleImage(event)">
+                            <i class="fas fa-image"></i>
+                            <p>Tap untuk upload foto</p>
+                            <small>PNG, JPG, GIF (Max 2MB)</small>
+                            <img id="imagePreview" class="image-preview" style="display:none;">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="ios-toggle" onclick="App.toggleFeatured()">
+                            <span class="toggle-label">Tandai Bestseller</span>
+                            <div class="toggle-switch" id="featuredToggle"></div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="sheet-footer">
+                <button class="ios-btn-large primary" onclick="App.saveProduct()">
+                    <i class="fas fa-check"></i> Simpan Produk
+                </button>
+                <button class="ios-btn-large secondary" onclick="App.closeSheet()">Batal</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cart Sheet -->
+    <div class="sheet-overlay" id="cartSheetOverlay" onclick="App.toggleCart()">
+        <div class="sheet-modal" onclick="event.stopPropagation()">
+            <div class="sheet-handle"></div>
+            <div class="sheet-header">
+                <h3 class="sheet-title">Keranjang Belanja</h3>
+                <button class="sheet-close" onclick="App.toggleCart()"><i class="fas fa-xmark"></i></button>
+            </div>
+            <div class="sheet-body">
+                <div id="cartItemsContainer"></div>
+                <div class="cart-total">
+                    <span class="total-label">Total</span>
+                    <span class="total-value" id="cartTotal">Rp 0</span>
+                </div>
+            </div>
+            <div class="sheet-footer">
+                <button class="ios-btn-large primary" onclick="App.checkout()">
+                    <i class="fas fa-credit-card"></i> Checkout Sekarang
+                </button>
+                <button class="ios-btn-large secondary" onclick="App.clearCart()">Kosongkan Keranjang</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Sheet -->
+    <div class="sheet-overlay" id="settingsSheetOverlay" onclick="App.closeSettings(event)">
+        <div class="sheet-modal" onclick="event.stopPropagation()">
+            <div class="sheet-handle"></div>
+            <div class="sheet-header">
+                <h3 class="sheet-title">Pengaturan</h3>
+                <button class="sheet-close" onclick="App.closeSettings()"><i class="fas fa-xmark"></i></button>
+            </div>
+            <div class="sheet-body">
+                <div class="form-group">
+                    <div class="ios-toggle" onclick="App.toggleSetting(this, 'animations')">
+                        <span class="toggle-label">Animasi</span>
+                        <div class="toggle-switch active"></div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="ios-toggle" onclick="App.toggleSetting(this, 'notifications')">
+                        <span class="toggle-label">Notifikasi</span>
+                        <div class="toggle-switch active"></div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="ios-toggle" onclick="App.toggleSetting(this, 'sync')">
+                        <span class="toggle-label">Auto Sync ke Cloud</span>
+                        <div class="toggle-switch active" id="syncToggle"></div>
+                    </div>
+                </div>
+                <div class="form-group" style="margin-top:30px;">
+                    <button class="ios-btn-large danger" onclick="App.resetData()">
+                        <i class="fas fa-trash"></i> Reset Semua Data
+                    </button>
+                </div>
+                <p class="version-text">DigitalStore v2.0 • Supabase Edition</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Help Sheet -->
+    <div class="sheet-overlay" id="helpSheetOverlay" onclick="App.closeHelp(event)">
+        <div class="sheet-modal" onclick="event.stopPropagation()">
+            <div class="sheet-handle"></div>
+            <div class="sheet-header">
+                <h3 class="sheet-title">Cara Penggunaan</h3>
+                <button class="sheet-close" onclick="App.closeHelp()"><i class="fas fa-xmark"></i></button>
+            </div>
+            <div class="sheet-body help-content">
+                <div class="help-item">
+                    <div class="help-num">1</div>
+                    <div class="help-text">
+                        <strong>Tambah Produk</strong>
+                        <p>Tap tombol "+ Baru" untuk menambahkan produk baru ke database cloud.</p>
+                    </div>
+                </div>
+                <div class="help-item">
+                    <div class="help-num">2</div>
+                    <div class="help-text">
+                        <strong>Edit Produk</strong>
+                        <p>Tap icon pensil pada card produk untuk mengedit detailnya.</p>
+                    </div>
+                </div>
+                <div class="help-item">
+                    <div class="help-num">3</div>
+                    <div class="help-text">
+                        <strong>Hapus Produk</strong>
+                        <p>Tap icon sampah untuk menghapus produk dari database.</p>
+                    </div>
+                </div>
+                <div class="help-item">
+                    <div class="help-num">4</div>
+                    <div class="help-text">
+                        <strong>Keranjang & Checkout</strong>
+                        <p>Tap "Beli" untuk menambahkan ke keranjang, lalu checkout untuk menyalin detail pesanan.</p>
+                    </div>
+                </div>
+                <div class="help-item">
+                    <div class="help-num">5</div>
+                    <div class="help-text">
+                        <strong>Sinkronisasi Cloud</strong>
+                        <p>Data produk tersimpan di Supabase Cloud dan sinkron otomatis antar device.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+        <p>Sinkronisasi...</p>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
