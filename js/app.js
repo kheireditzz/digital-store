@@ -10,7 +10,8 @@ const SUPABASE_URL = 'https://xjjilzbqdsqopbxfggiv.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_nrgI-f90SYolBJ8fzwv_EQ_MMx6f1wq';
 
 // Google OAuth Credentials (dari user)
-const GOOGLE_CLIENT_ID = '307105085538-3i914434c0dl1disga93ik52907bbr3o.apps.googleusercontent.com';
+const GOOGLE_CLIENT_ID = '307105085538-3i914434c0dl1disga93ik52907bbr3o.apps.googleusercontent.com
+';
 
 // ============================================
 // SUPABASE CLIENT
