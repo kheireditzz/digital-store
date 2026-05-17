@@ -534,122 +534,30 @@ document.addEventListener('DOMContentLoaded', () => {
     setupKeyboard();
 });
 
-
 // ===== WRAPPER UNTUK COMPATIBILITY =====
-// Agar index.html yang pakai Auth.signInWithGoogle() tetap works
-const Auth = {
-    signInWithGoogle: signInWithGoogle,
-    signOut: signOut,
-    getUser: async () => currentUser,
-    currentUser: null
-};
+// Agar index.html yang pakai Auth.signInWithGoogle() tetap jalan tanpa error bentrok nama
+if (typeof Auth === 'undefined') {
+    // Jika belum ada deklarasi Auth sama sekali di atas
+    window.Auth = {
+        signInWithGoogle: signInWithGoogle,
+        signOut: signOut,
+        getUser: async () => currentUser,
+        currentUser: null
+    };
+} else {
+    // Jika Auth sudah dideklarasikan di bagian atas, kita gabungkan propertinya tanpa membuat variabel baru
+    Auth.signInWithGoogle = signInWithGoogle;
+    Auth.signOut = signOut;
+    Auth.getUser = async () => currentUser;
+    Auth.currentUser = currentUser || null;
+}
 
 // Update Auth.currentUser saat login
 const originalShowApp = showApp;
 showApp = function() {
-    Auth.currentUser = currentUser;
-    return originalShowApp.apply(this, arguments);
-};
-
-
-// ===== WRAPPER UNTUK COMPATIBILITY =====
-// Agar index.html yang pakai Auth.signInWithGoogle() tetap works
-const Auth = {
-    signInWithGoogle: signInWithGoogle,
-    signOut: signOut,
-    getUser: async () => currentUser,
-    currentUser: null
-};
-
-// Update Auth.currentUser saat login
-const originalShowApp = showApp;
-showApp = function() {
-    Auth.currentUser = currentUser;
-    return originalShowApp.apply(this, arguments);
-};
-
-
-// ===== WRAPPER UNTUK COMPATIBILITY =====
-// Agar index.html yang pakai Auth.signInWithGoogle() tetap works
-const Auth = {
-    signInWithGoogle: signInWithGoogle,
-    signOut: signOut,
-    getUser: async () => currentUser,
-    currentUser: null
-};
-
-// Update Auth.currentUser saat login
-const originalShowApp = showApp;
-showApp = function() {
-    Auth.currentUser = currentUser;
-    return originalShowApp.apply(this, arguments);
-};
-
-
-// ===== WRAPPER UNTUK COMPATIBILITY =====
-// Agar index.html yang pakai Auth.signInWithGoogle() tetap works
-const Auth = {
-    signInWithGoogle: signInWithGoogle,
-    signOut: signOut,
-    getUser: async () => currentUser,
-    currentUser: null
-};
-
-// Update Auth.currentUser saat login
-const originalShowApp = showApp;
-showApp = function() {
-    Auth.currentUser = currentUser;
-    return originalShowApp.apply(this, arguments);
-};
-
-
-// ===== WRAPPER UNTUK COMPATIBILITY =====
-// Agar index.html yang pakai Auth.signInWithGoogle() tetap works
-const Auth = {
-    signInWithGoogle: signInWithGoogle,
-    signOut: signOut,
-    getUser: async () => currentUser,
-    currentUser: null
-};
-
-// Update Auth.currentUser saat login
-const originalShowApp = showApp;
-showApp = function() {
-    Auth.currentUser = currentUser;
-    return originalShowApp.apply(this, arguments);
-};
-
-
-// ===== WRAPPER UNTUK COMPATIBILITY =====
-// Agar index.html yang pakai Auth.signInWithGoogle() tetap works
-const Auth = {
-    signInWithGoogle: signInWithGoogle,
-    signOut: signOut,
-    getUser: async () => currentUser,
-    currentUser: null
-};
-
-// Update Auth.currentUser saat login
-const originalShowApp = showApp;
-showApp = function() {
-    Auth.currentUser = currentUser;
-    return originalShowApp.apply(this, arguments);
-};
-
-
-// ===== WRAPPER UNTUK COMPATIBILITY =====
-// Agar index.html yang pakai Auth.signInWithGoogle() tetap works
-const Auth = {
-    signInWithGoogle: signInWithGoogle,
-    signOut: signOut,
-    getUser: async () => currentUser,
-    currentUser: null
-};
-
-// Update Auth.currentUser saat login
-const originalShowApp = showApp;
-showApp = function() {
-    Auth.currentUser = currentUser;
+    if (typeof Auth !== 'undefined') {
+        Auth.currentUser = currentUser;
+    }
     return originalShowApp.apply(this, arguments);
 };
 
