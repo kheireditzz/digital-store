@@ -537,38 +537,6 @@ async function resetData() {
     cart = [];
     localStorage.removeItem('digitalStore_products');
     localStorage.removeItem('digitalStore_cart');
-    renderProducts();
-    updateStats();
-    updateCartUI();
-    closeSettings();
-}
-
-// Help
-function showHelp() {
-    document.getElementById('helpSheetOverlay').classList.add('active');
-    document.body.style.overflow = 'hidden';
-}
-
-function closeHelp(e) {
-    if (e && e.target !== e.currentTarget) return;
-    document.getElementById('helpSheetOverlay').classList.remove('active');
-    document.body.style.overflow = '';
-}
-
-// Profile
-function toggleProfile() {
-    document.getElementById('profileSheetOverlay').classList.add('active');
-    document.body.style.overflow = 'hidden';
-    if (currentUser) {
-        document.getElementById('profileName').textContent = currentUser.user_metadata?.full_name || currentUser.email?.split('@')[0] || 'Pengguna';
-        document.getElementById('profileEmail').textContent = currentUser.email || '';
-        if (currentUser.user_metadata?.avatar_url) {
-            document.getElementById('profileAvatar').src = currentUser.user_metadata.avatar_url;
-        }
-    }
-    document.getElementById('profileProductCount').textContent = products.length;
-    document.getElementById('profileCartCount').textContent = cart.length;
-}
 
 function closeProfile(e) {
     if (e && e.target !== e.currentTarget) return;
