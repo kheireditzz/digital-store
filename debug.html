@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug - DigitalStore</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
+            background: #000;
+            color: #fff;
+            padding: 20px;
+            line-height: 1.6;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .debug-box {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 12px;
+            padding: 16px;
+            margin: 12px 0;
+            word-break: break-all;
+        }
+        .success { color: #30D158; border-color: #30D158; }
+        .error { color: #FF453A; border-color: #FF453A; }
+        .warning { color: #FF9F0A; border-color: #FF9F0A; }
+        .info { color: #0A84FF; border-color: #0A84FF; }
+        h2 { color: #0A84FF; margin-top: 30px; font-size: 1.1rem; }
+        button {
+            background: #0A84FF;
+            color: white;
+            border: none;
+            padding: 14px 24px;
+            border-radius: 12px;
+            font-size: 1rem;
+            cursor: pointer;
+            margin: 10px 5px;
+            font-family: inherit;
+        }
+        .log-entry {
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            font-family: monospace;
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 DigitalStore Debug Tool</h1>
+    <p style="color: rgba(255,255,255,0.6);">Halaman ini membantu mendiagnosi masalah login tanpa perlu F12</p>
+
+    <h2>1. Konfigurasi Supabase</h2>
+    <div id="config-check" class="debug-box">Memeriksa...</div>
+
+    <h2>2. Test Koneksi Supabase</h2>
+    <button onclick="testConnection()">Test Koneksi</button>
+    <div id="connection-result" class="debug-box">Belum di-test</div>
+
+    <h2>3. Test Login Google</h2>
+    <button onclick="testLogin()">Test Login Google</button>
+    <div id="login-result" class="debug-box">Belum di-test</div>
+
+    <h2>4. Log & Error</h2>
+    <div id="log-container" class="debug-box" style="max-height: 400px; overflow-y: auto;">
+        <div class="log-entry">Log akan muncul di sini...</div>
+    </div>
+
+    <h2>5. Info Browser</h2>
+    <div id="browser-info" class="debug-box">Memeriksa...</div>
+
+    <br><br>
+    <a href="index.html" style="color: #0A84FF; text-decoration: none; font-size: 1.1rem;">
+        ← Kembali ke App
+    </a>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        // Konfigurasi SAMA dengan app.js
+        const SUPABASE_URL = 'https://xjjilzbqdsqopbxfggiv.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_nrgI-f90SYolBJ8fzwv_EQ_MMx6f1wq';
+
+        let supabase = null;
+
+        function addLog(message, type = 'info') {
+            const time = new Date().toLocaleTimeString();
+            const container = document.getElementById('log-container');
+            const div = document.createElement('div');
+            div.className = 'log-entry';
+            div.style.color = type === 'error' ? '#FF453A' : type === 'success' ? '#30D158' : '#0A84FF';
+            div.textContent = `[${time}] ${message}`;
+            container.insertBefore(div, container.firstChild);
+        }
+
+        // Check config
+        function checkConfig() {
+            const box = document.getElementById('config-check');
+            let html = '';
+
+            if (SUPABASE_URL.includes('YOUR_PROJECT_ID')) {
+                html += '<div class="error">❌ SUPABASE_URL masih default!</div>';
+            } else {
+                html += `<div class="success">✅ SUPABASE_URL: ${SUPABASE_URL}</div>`;
+            }
+
+            if (SUPABASE_ANON_KEY.includes('YOUR_ANON_KEY')) {
+                html += '<div class="error">❌ SUPABASE_ANON_KEY masih default!</div>';
+            } else {
+                html += `<div class="success">✅ SUPABASE_ANON_KEY: ${SUPABASE_ANON_KEY.substring(0, 20)}...</div>`;
+            }
+
+            // Check if supabase library loaded
+            if (typeof window.supabase !== 'undefined') {
+                html += '<div class="success">✅ Supabase library loaded</div>';
+            } else {
+                html += '<div class="error">❌ Supabase library NOT loaded!</div>';
+            }
+
+            box.innerHTML = html;
+            addLog('Config check done');
+        }
+
+        // Test connection
+        async function testConnection() {
+            const box = document.getElementById('connection-result');
+            box.innerHTML = 'Testing...';
+            addLog('Testing Supabase connection...');
+
+            try {
+                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                const { data, error } = await supabase.from('products').select('count', { count: 'exact', head: true });
+
+                if (error) {
+                    box.innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
+                    addLog(`Connection failed: ${error.message}`, 'error');
+                } else {
+                    box.innerHTML = `<div class="success">✅ Connected! Products table exists.</div>`;
+                    addLog('Connection successful!', 'success');
+                }
+            } catch (e) {
+                box.innerHTML = `<div class="error">❌ Exception: ${e.message}</div>`;
+                addLog(`Exception: ${e.message}`, 'error');
+            }
+        }
+
+        // Test login
+        async function testLogin() {
+            const box = document.getElementById('login-result');
+            box.innerHTML = 'Testing login...';
+            addLog('Testing Google login...');
+
+            if (!supabase) {
+                try {
+                    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                } catch (e) {
+                    box.innerHTML = `<div class="error">❌ Failed to init Supabase: ${e.message}</div>`;
+                    addLog(`Init failed: ${e.message}`, 'error');
+                    return;
+                }
+            }
+
+            try {
+                const { data, error } = await supabase.auth.signInWithOAuth({
+                    provider: 'google',
+                    options: {
+                        redirectTo: window.location.origin + '/digital-store/index.html'
+                    }
+                });
+
+                if (error) {
+                    box.innerHTML = `<div class="error">❌ OAuth Error: ${error.message}</div>`;
+                    addLog(`OAuth error: ${error.message}`, 'error');
+                } else if (data?.url) {
+                    box.innerHTML = `<div class="success">✅ OAuth URL generated!</div>`;
+                    addLog('OAuth URL generated successfully', 'success');
+
+                    // Tampilkan link untuk klik manual
+                    const link = document.createElement('a');
+                    link.href = data.url;
+                    link.textContent = '👉 Klik di sini untuk login';
+                    link.style.color = '#30D158';
+                    link.style.display = 'block';
+                    link.style.marginTop = '10px';
+                    link.style.fontSize = '1.1rem';
+                    box.appendChild(link);
+                } else {
+                    box.innerHTML = '<div class="warning">⚠️ No URL returned</div>';
+                    addLog('No URL returned', 'warning');
+                }
+            } catch (e) {
+                box.innerHTML = `<div class="error">❌ Exception: ${e.message}</div>`;
+                addLog(`Login exception: ${e.message}`, 'error');
+            }
+        }
+
+        // Browser info
+        function showBrowserInfo() {
+            const box = document.getElementById('browser-info');
+            box.innerHTML = `
+                <div>URL: ${window.location.href}</div>
+                <div>Origin: ${window.location.origin}</div>
+                <div>User Agent: ${navigator.userAgent.substring(0, 50)}...</div>
+                <div>Online: ${navigator.onLine ? 'Yes' : 'No'}</div>
+            `;
+            addLog('Browser info collected');
+        }
+
+        // Init
+        window.onload = () => {
+            checkConfig();
+            showBrowserInfo();
+            addLog('Debug page loaded');
+        };
+
+        // Catch global errors
+        window.onerror = (msg, url, line) => {
+            addLog(`Global error: ${msg} (line ${line})`, 'error');
+            return false;
+        };
+    </script>
+</body>
+</html>
