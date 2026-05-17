@@ -561,3 +561,40 @@ showApp = function() {
     return originalShowApp.apply(this, arguments);
 };
 
+// ===== JEMBATAN COMPATIBILITY UNTUK TOMBOL MENU (APP) =====
+if (typeof App === 'undefined') {
+    window.App = {
+        // Mengubungkan tombol navigasi menu HTML langsung ke fungsi bawaan sistem kamu
+        showPage: function(pageId) {
+            if (typeof showPage === 'function') {
+                showPage(pageId); 
+            } else {
+                // Skrip cadangan untuk memindahkan halaman jika fungsi utama terkunci
+                const pages = document.querySelectorAll('.page, section, [data-page]');
+                pages.forEach(p => p.classList.remove('active'));
+                const targetPage = document.getElementById(pageId);
+                if (targetPage) targetPage.classList.add('active');
+            }
+        },
+        
+        // Jembatan untuk tombol "+ Baru" agar bisa memunculkan modal produk
+        openModal: function(modalId) {
+            if (typeof openModal === 'function') {
+                openModal(modalId);
+            } else {
+                const modal = document.getElementById(modalId || 'productModal');
+                if (modal) modal.style.display = 'block';
+            }
+        },
+        closeModal: function(modalId) {
+            if (typeof closeModal === 'function') {
+                closeModal(modalId);
+            } else {
+                const modal = document.getElementById(modalId || 'productModal');
+                if (modal) modal.style.display = 'none';
+            }
+        },
+        
+        init: typeof init === 'function' ? init : function() {}
+    };
+}
