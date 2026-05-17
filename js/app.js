@@ -537,32 +537,39 @@ document.addEventListener('DOMContentLoaded', () => {
 // ===== WRAPPER UNTUK COMPATIBILITY =====
 // Agar index.html yang pakai Auth.signInWithGoogle() tetap jalan tanpa error bentrok nama
 if (typeof Auth === 'undefined') {
-    // Jika belum ada deklarasi Auth sama sekali di atas
+
+// ===================================================
+// ===== JEMBATAN COMPATIBILITY (AUTH & APP GLOBAL) =====
+// ===================================================
+
+// 1. Jembatan untuk sistem Auth Supabase (Memperbaiki Login Google)
+if (typeof Auth === 'undefined') {
     window.Auth = {
-        signInWithGoogle: signInWithGoogle,
-        signOut: signOut,
-        getUser: async () => currentUser,
-        currentUser: null
+        signInWithGoogle: typeof signInWithGoogle === 'function' ? signInWithGoogle : async () => {},
+        signOut: typeof signOut === 'function' ? signOut : async () => {},
+        getUser: async () => typeof currentUser !== 'undefined' ? currentUser : null,
+        currentUser: typeof currentUser !== 'undefined' ? currentUser : null
     };
 } else {
- 
-    // ===== JEMBATAN COMPATIBILITY UNTUK TOMBOL MENU (APP) =====
+    if (typeof signInWithGoogle === 'function') Auth.signInWithGoogle = signInWithGoogle;
+    if (typeof signOut === 'function') Auth.signOut = signOut;
+    Auth.getUser = async () => typeof currentUser !== 'undefined' ? currentUser : null;
+    Auth.currentUser = typeof currentUser !== 'undefined' ? currentUser : null;
+}
+
+// 2. Jembatan untuk objek App (Memperbaiki Semua Tombol Ikon Menu & "+ Baru")
 if (typeof App === 'undefined') {
     window.App = {
-        // Mengubungkan tombol navigasi menu HTML langsung ke fungsi bawaan sistem kamu
         showPage: function(pageId) {
             if (typeof showPage === 'function') {
                 showPage(pageId); 
             } else {
-                // Skrip cadangan untuk memindahkan halaman jika fungsi utama terkunci
                 const pages = document.querySelectorAll('.page, section, [data-page]');
                 pages.forEach(p => p.classList.remove('active'));
                 const targetPage = document.getElementById(pageId);
                 if (targetPage) targetPage.classList.add('active');
             }
         },
-        
-        // Jembatan untuk tombol "+ Baru" agar bisa memunculkan modal produk
         openModal: function(modalId) {
             if (typeof openModal === 'function') {
                 openModal(modalId);
@@ -579,7 +586,6 @@ if (typeof App === 'undefined') {
                 if (modal) modal.style.display = 'none';
             }
         },
-        
         init: typeof init === 'function' ? init : function() {}
     };
 }
