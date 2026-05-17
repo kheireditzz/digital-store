@@ -545,23 +545,8 @@ if (typeof Auth === 'undefined') {
         currentUser: null
     };
 } else {
-    // Jika Auth sudah dideklarasikan di bagian atas, kita gabungkan propertinya tanpa membuat variabel baru
-    Auth.signInWithGoogle = signInWithGoogle;
-    Auth.signOut = signOut;
-    Auth.getUser = async () => currentUser;
-    Auth.currentUser = currentUser || null;
-}
-
-// Update Auth.currentUser saat login
-const originalShowApp = showApp;
-showApp = function() {
-    if (typeof Auth !== 'undefined') {
-        Auth.currentUser = currentUser;
-    }
-    return originalShowApp.apply(this, arguments);
-};
-
-// ===== JEMBATAN COMPATIBILITY UNTUK TOMBOL MENU (APP) =====
+ 
+    // ===== JEMBATAN COMPATIBILITY UNTUK TOMBOL MENU (APP) =====
 if (typeof App === 'undefined') {
     window.App = {
         // Mengubungkan tombol navigasi menu HTML langsung ke fungsi bawaan sistem kamu
