@@ -1,5 +1,101 @@
 /* DigitalStore - Minimal Supabase Edition */
+[23.38, 17/5/2026] Dek Rin: // ===================================================
+// ===== JEMBATAN COMPATIBILITY (AUTH & APP GLOBAL) =====
+// ===================================================
 
+// 1. Jembatan untuk sistem Auth Supabase (Memperbaiki Login Google)
+if (typeof Auth === 'undefined') {
+    window.Auth = {
+        signInWithGoogle: typeof signInWithGoogle === 'function' ? signInWithGoogle : async () => {},
+        signOut: typeof signOut === 'function' ? signOut : async () => {},
+        getUser: async () => typeof currentUser !== 'undefined' ? currentUser : null,
+        currentUser: typeof currentUser !== 'undefined' ? currentUser : null
+    };
+} else {
+    if (typeof signInWithGoogle === 'function') Auth.signInWithGoogle = signInWithGoogle;
+    if (typeof signOut === 'function') Auth.signOut = signOut;
+    Auth.getUser = async () => typeof currentUser !== 'undefined' ? currentUser : null;
+    Auth.currentUser = typeof currentUser !== 'undefined' ? currentUser : null;
+}
+
+// 2. Jembatan untuk objek App (Memperbaiki Semua Tombol Ikon Menu & "+ Baru")
+if (typeof App === 'undefined') {
+    window.App = {
+        showPage: function(pageId) {
+            if (typeof showPage === 'function') {
+                showPage(pageId); 
+            } else {
+                const pages = document.querySelectorAll('.page, section, [data-page]');
+                pages.forEach(p => p.classList.remove('active'));
+                const targetPage = document.getElementById(pageId);
+                if (targetPage) targetPage.classList.add('active');
+            }
+        },
+        openModal: function(modalId) {
+            if (typeof openModal === 'function') {
+                openModal(modalId);
+            } else {
+                const modal = document.getElementById(modalId || 'productModal');
+                if (modal) modal.style.display = 'block';
+            }
+        },
+        closeModal: function(modalId) {
+            if (typeof closeModal === 'function') {
+                closeModal(modalId);
+            } else {
+                const modal = document.getElementById(modalId || 'productModal');
+                if (modal) modal.style.display = 'none';
+            }
+        },
+        init: typeof init === 'function' ? init : function() {}
+    };
+}
+[23.45, 17/5/2026] Dek Rin: // =============================================================
+// PILAR UTAMA: JEMBATAN COMPATIBILITY (AUTH & APP GLOBAL)
+// Wajib ditaruh di Baris 1 agar tombol HTML tidak memicu eror
+// =============================================================
+window.App = {
+    showPage: function(pageId) {
+        if (typeof showPage === 'function') {
+            showPage(pageId); 
+        } else {
+            // Jalur alternatif jika fungsi showPage global belum termuat
+            const pages = document.querySelectorAll('.page, section, [data-page]');
+            pages.forEach(p => p.classList.remove('active'));
+            const targetPage = document.getElementById(pageId);
+            if (targetPage) targetPage.classList.add('active');
+        }
+    },
+    openModal: function(modalId) {
+        if (typeof openModal === 'function') {
+            openModal(modalId);
+        } else {
+            const modal = document.getElementById(modalId || 'productModal');
+            if (modal) modal.style.display = 'block';
+        }
+    },
+    closeModal: function(modalId) {
+        if (typeof closeModal === 'function') {
+            closeModal(modalId);
+        } else {
+            const modal = document.getElementById(modalId || 'productModal');
+            if (modal) modal.style.display = 'none';
+        }
+    },
+    init: function() {
+        if (typeof init === 'function') init();
+    }
+};
+
+if (typeof Auth === 'undefined') {
+    window.Auth = {
+        signInWithGoogle: function() { if (typeof signInWithGoogle === 'function') signInWithGoogle(); },
+        signOut: function() { if (typeof signOut === 'function') signOut(); },
+        getUser: async () => typeof currentUser !== 'undefined' ? currentUser : null,
+        currentUser: null
+    };
+}
+// =============================================================
 // Konfigurasi
 const SUPABASE_URL = 'https://xjjilzbqdsqopbxfggiv.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_nrgI-f90SYolBJ8fzwv_EQ_MMx6f1wq';
